@@ -6,10 +6,11 @@ from seleniumwire import webdriver
 import re
 from selenium.webdriver.common.keys import Keys
 
-# Create a new instance of the Firefox driver. We can also use the Chrome
-
-
 location_url = input("Please enter the location URL: ")
+
+if location_url.endswith("/"):
+    location_url = location_url[:-1]
+
 url_regex = re.compile('^http.*')
 
 if url_regex.match(location_url):
@@ -42,35 +43,23 @@ for elem in elements:
     href = elem.get_attribute('href')
     url_match_regex = re.compile('.*centres.*|.*store.*|.*location.*')
     if url_match_regex.match(str(href)):
-        print("Store locations URL can be:" + href)
-
-
-#    if href is not None:
-#       assert isinstance(href, object)
-#      print(href)
+        url_not_match_regex = re.compile('(?!.*google.*)')
+        if url_not_match_regex.match(str(href)):
+            print(href)
 
 
 # var_regex = r"\b(?=\w)" + re.escape(TEXTO) + r"\b(?!\w)"
 
 
-def resp():
-    for request in driver.requests:
-        if request.response:
-            print(
-                request.url,
-                request.response.headers['Content-Type']
-            )
-
-
 def respo():
-    for requ in driver.requests:
-        res = requ.response.headers['Content-Type']
-        if res == "application/json" or res == "application/json; charset=utf-8":
-            print(requ.url)
+    try:
+        for requ in driver.requests:
+            res = requ.response.headers['Content-Type']
+            if res == "application/json" or res == "application/json; charset=utf-8":
+                print(requ.url)
+    except:
+        print("Some headers does not have the Content-Type defined so ignoring then")
+    return requ.url
 
-'''
-try:
-    respo()
-except:
-    print("Some headers does not have the Content-Type defined so ignoring then")
-'''
+
+api_list = [respo()]
